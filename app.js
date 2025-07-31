@@ -5,13 +5,16 @@ const helmet = require('helmet')
 
 const app = express()
 
-// Custom configuration/modules/routes
+// Custom configuration/modules/routes/middlewares
 const config = require('./utils/config')
 const rateLimit = require("express-rate-limit");
 
+// Routes
 const v1Routes = require('./routes/v1/index')
+const authRoutes = require('./routes/v1/auth.routes')
+const urlRoutes = require('./routes/v1/url.routes')
 
-const { connectToDatabase } = require('./utils/connectToDatabase')
+const { connectToDatabase } = require('./utils/db')
 
 const limiter = rateLimit({
     windowMs: 60 * 1000, // 15 minutes
@@ -54,6 +57,9 @@ app.get('/', (request, response) => {
 })
 
 app.use('/api/v1', v1Routes)
+app.use('/api/v1', authRoutes)
+app.use('/api/v1', urlRoutes)
+
 
 const server = app.listen(config.PORT, async () => {
     await connectToDatabase()
